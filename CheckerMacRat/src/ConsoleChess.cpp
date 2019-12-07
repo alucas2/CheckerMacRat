@@ -55,7 +55,7 @@ bool ConsoleChess::play(std::string fen)
 		for(Move m : MoveGenerator::getPseudoLegalMoves(top))
 		{
 			if(top.performMove(m).second)
-				legalMoves.emplace(m.getUCI(), m);
+				legalMoves.emplace(m.getNotation(), m);
 		}
 
 		if(top.getSideToMove() == WHITE)

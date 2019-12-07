@@ -3,6 +3,7 @@
 .bin/
 
 *.sln
+*.props
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user

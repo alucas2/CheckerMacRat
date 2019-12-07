@@ -16,7 +16,7 @@ public:
 	GameState();
 
 	//Renvoie la position en notation FEN
-	std::string getFen() const;
+	std::string getNotation() const;
 
 	//Renvoie le masque de toutes les pièces d'une couleur
 	template<Color color>

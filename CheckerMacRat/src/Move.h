@@ -30,26 +30,26 @@ public:
 		return static_cast<MoveFlags>(m_data >> 12 & 15);
 	}
 
-	std::string getUCI()
+	std::string getNotation()
 	{
-		std::string uci;
+		std::string notation;
 		Square from = getFrom();
 		Square to = getTo();
 		MoveFlags flags = getFlags();
-		uci.push_back(label(colOf(from)));
-		uci.push_back(label(rowOf(from)));
-		uci.push_back(label(colOf(to)));
-		uci.push_back(label(rowOf(to)));
+		notation.push_back(label(colOf(from)));
+		notation.push_back(label(rowOf(from)));
+		notation.push_back(label(colOf(to)));
+		notation.push_back(label(rowOf(to)));
 
 		if(flags & PROMOTION_FLAG)
 		{
-			if(		flags == PROMOTION_QUEEN)	uci.push_back('q');
-			else if(flags == PROMOTION_ROOK)	uci.push_back('r');
-			else if(flags == PROMOTION_BISHOP)	uci.push_back('b');
-			else if(flags == PROMOTION_KNIGHT)	uci.push_back('n');
+			if(		flags == PROMOTION_QUEEN)	notation.push_back('q');
+			else if(flags == PROMOTION_ROOK)	notation.push_back('r');
+			else if(flags == PROMOTION_BISHOP)	notation.push_back('b');
+			else if(flags == PROMOTION_KNIGHT)	notation.push_back('n');
 		}
 
-		return uci;
+		return notation;
 	}
 
 private:

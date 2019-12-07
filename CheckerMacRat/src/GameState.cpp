@@ -81,7 +81,7 @@ GameState::GameState():
 	GameState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 {}
 
-std::string GameState::getFen() const
+std::string GameState::getNotation() const
 {
 	std::string fen;
 
