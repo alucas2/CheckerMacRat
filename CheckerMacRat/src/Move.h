@@ -4,15 +4,15 @@
 #include <stdint.h>
 #include <string>
 
-//La classe Move code un mouvement sur 16 bits
+//La classe Move code un mouvement sur 16 bits et contient une valeur
 //bits 0 à 5: case de départ
 //bits 5 à 11: case d'arrivée
-//bits 12 à 15: drapeaux, voir la définition de MoveFlags
+//bits 12 à 15: drapeaux, voir la définition de MoveFlags 
 class Move
 {
 public:
-	Move(Square from = SQUARE_A1, Square to = SQUARE_A1, MoveFlags flags = static_cast<MoveFlags>(0)):
-		m_data(from | to << 6 | flags << 12)
+	Move(Square from = SQUARE_A1, Square to = SQUARE_A1, MoveFlags flags = static_cast<MoveFlags>(0), int value = 0):
+		m_data(from | to << 6 | flags << 12), m_value(value)
 	{}
 
 	Square getFrom() const
@@ -30,16 +30,41 @@ public:
 		return static_cast<MoveFlags>(m_data >> 12 & 15);
 	}
 
+	int getValue() const
+	{
+		return m_value;
+	}
+
+	void setValue(int value)
+	{
+		m_value = value;
+	}
+
+	bool operator<(const Move& other)
+	{
+		return m_value < other.m_value;
+	}
+
 	std::string getNotation()
 	{
-		std::string notation;
 		Square from = getFrom();
 		Square to = getTo();
 		MoveFlags flags = getFlags();
-		notation.push_back(label(colOf(from)));
-		notation.push_back(label(rowOf(from)));
-		notation.push_back(label(colOf(to)));
-		notation.push_back(label(rowOf(to)));
+
+		if(flags == CASTLE_EAST)
+		{
+			return "O-O";
+		}
+		else if (flags == CASTLE_WEST)
+		{
+			return "O-O-O";
+		}
+
+		std::string notation;
+		notation.push_back(label(fileOf(from)));
+		notation.push_back(label(rankOf(from)));
+		notation.push_back(label(fileOf(to)));
+		notation.push_back(label(rankOf(to)));
 
 		if(flags & PROMOTION_FLAG)
 		{
@@ -54,4 +79,5 @@ public:
 
 private:
 	uint16_t m_data;
+	int m_value;
 };

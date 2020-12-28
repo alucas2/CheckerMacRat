@@ -4,7 +4,7 @@
 #include "Move.h"
 #include "MoveGenerator.h"
 #include "GameState.h"
-#include "Bitboard.h"
+#include "Search.h"
 #include <stack>
 #include <unordered_map>
 #include <iostream>

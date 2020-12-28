@@ -5,7 +5,6 @@
 #include "Move.h"
 #include "Attacks.h"
 #include <vector>
-#include <algorithm>
 
 class MoveGenerator
 {
@@ -72,7 +71,7 @@ private:
 	static void appendPawnMoves(std::vector<Move>& moves, const GameState& position)
 	{
 		Bitboard departures = position.getPieces<color, PAWN>();
-		constexpr Row lastRow = color == WHITE ? ROW_7 : ROW_2;
+		constexpr Rank lastRow = color == WHITE ? RANK_7 : RANK_2;
 		while(departures)
 		{
 			Square from = popFirstSquare(departures);
@@ -81,7 +80,7 @@ private:
 				pawnAttacks<color>(from, position.getPieces<!color>()) | 
 				pawnPushes<color>(from, position.getPieces()) & ~position.getPieces<color>();
 
-			if(rowOf(from) != lastRow)
+			if(rankOf(from) != lastRow)
 				while(arrivals)
 					moves.emplace_back(from, popFirstSquare(arrivals));
 			else
@@ -157,12 +156,12 @@ private:
 	{
 		std::vector<Move> moves;
 		
-		appendPawnMoves<color>(moves, position);
-		appendKnightMoves<color>(moves, position);
-		appendBishopMoves<color>(moves, position);
-		appendRookMoves<color>(moves, position);
-		appendKingMoves<color>(moves, position);
 		appendCastles<color>(moves, position);
+		appendKingMoves<color>(moves, position);
+		appendRookMoves<color>(moves, position);
+		appendBishopMoves<color>(moves, position);
+		appendKnightMoves<color>(moves, position);
+		appendPawnMoves<color>(moves, position);
 
 		return moves;
 	}
@@ -170,8 +169,4 @@ private:
 public:
 	//Renvoie la liste des mouvements pseudo-légaux
 	static std::vector<Move> getPseudoLegalMoves(const GameState& from);
-
-	//Renvoie la liste des mouvements légaux qui est un sous-ensemble des mouvements pseudo-légaux.
-	//Beacoup plus lent que de générer les mouvements pseudo-légaux car cela nécessite d'effectuer le mouvement
-	static std::vector<Move> getLegalMoves(const GameState& from);
 };

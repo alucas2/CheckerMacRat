@@ -10,14 +10,14 @@ GameState::GameState(std::string fen):
 	std::string::iterator it = fen.begin();
 
 	//Partie 1: disposition du plateau
-	for(Row row = ROW_8; row >= ROW_1; row = static_cast<Row>(row - 1))
+	for(Rank row = RANK_8; row >= RANK_1; row = static_cast<Rank>(row - 1))
 	{
-		for(Col col = COL_A; col <= COL_H; col = static_cast<Col>(col + 1))
+		for(File col = FILE_A; col <= FILE_H; col = static_cast<File>(col + 1))
 		{
 			char pieceLabel = *it++;
 			if('1' <= pieceLabel && pieceLabel <= '8')
 			{
-				col = static_cast<Col>(col + (pieceLabel - '1'));
+				col = static_cast<File>(col + (pieceLabel - '1'));
 			}
 			else
 			{
@@ -34,8 +34,10 @@ GameState::GameState(std::string fen):
 				else if(pieceLabel == 'K' || pieceLabel == 'k')	m_pieceMask[KING] |= sqMask;
 			}
 		}
+		if(it == fen.end()) return;
 		if(*it == '/') it++;
 	}
+
 
 	//Partie 2: la couleur qui doit jouer le prochain tour
 	while(*it++ != ' ');
@@ -62,9 +64,9 @@ GameState::GameState(std::string fen):
 	while(*it++ != ' ');
 	if(*it != '-')
 	{
-		Col epCol = static_cast<Col>(*it - 'a');
+		File epCol = static_cast<File>(*it - 'a');
 		it++;
-		Row epRow = static_cast<Row>(*it - '1');
+		Rank epRow = static_cast<Rank>(*it - '1');
 		m_lastJumpedSquare = static_cast<Square>(8*epRow + epCol);
 	}
 
@@ -86,9 +88,9 @@ std::string GameState::getNotation() const
 	std::string fen;
 
 	//Partie 1: disposition du plateau
-	for(Row row = ROW_8; row >= ROW_1; row = static_cast<Row>(row - 1))
+	for(Rank row = RANK_8; row >= RANK_1; row = static_cast<Rank>(row - 1))
 	{
-		for(Col col = COL_A; col <= COL_H; col = static_cast<Col>(col + 1))
+		for(File col = FILE_A; col <= FILE_H; col = static_cast<File>(col + 1))
 		{
 			Square sq = static_cast<Square>(8*row + col);
 			Piece piece = getPieceAt(sq);
@@ -116,7 +118,7 @@ std::string GameState::getNotation() const
 				fen.push_back(next);
 			}
 		}
-		if(row != ROW_1)
+		if(row != RANK_1)
 			fen.push_back('/');
 	}
 
@@ -143,8 +145,8 @@ std::string GameState::getNotation() const
 	fen.push_back(' ');
 	if(m_lastJumpedSquare != NULL_SQUARE)
 	{
-		fen.push_back(label(colOf(m_lastJumpedSquare)));
-		fen.push_back(label(rowOf(m_lastJumpedSquare)));
+		fen.push_back(label(fileOf(m_lastJumpedSquare)));
+		fen.push_back(label(rankOf(m_lastJumpedSquare)));
 	}
 	else
 		fen.push_back('-');
@@ -155,7 +157,7 @@ std::string GameState::getNotation() const
 
 	//Partie 6: fullmoves
 	fen.push_back(' ');
-	fen.push_back(m_fullMoveCount + '0');
+	fen.push_back(m_fullMoveCount + '0');//FIXME not like this you idiot
 
 	return fen;
 }
@@ -183,7 +185,7 @@ Color GameState::getColorAt(Square square) const
 	return NULL_COLOR;
 }
 
-std::pair<GameState, bool> GameState::performMove(Move move) const
+GameState GameState::performMove(Move move) const
 {
 	GameState result(*this);
 	Color movingColor = m_sideToMove;
@@ -262,19 +264,12 @@ std::pair<GameState, bool> GameState::performMove(Move move) const
 		result.m_castleRights[movingColor] = NO_RIGHTS;
 	else if(movingPiece == ROOK)
 	{
-		Col col = colOf(from);
-		if(col == COL_A)
+		File col = fileOf(from);
+		if(col == FILE_A)
 			result.m_castleRights[movingColor] &= ~RIGHT_WEST;
-		else if(col == COL_H)
+		else if(col == FILE_H)
 			result.m_castleRights[movingColor] &= ~RIGHT_EAST;
 	}
-
-	//Teste si le mouvement ne laisse pas le roi en échec
-	bool isLegal;
-	if(movingColor == WHITE)
-		isLegal = !result.isAttacked<BLACK>(firstSquare(result.getPieces<WHITE, KING>()));
-	else
-		isLegal = !result.isAttacked<WHITE>(firstSquare(result.getPieces<BLACK, KING>()));
 
 	//Met à jour le tour
 	result.m_sideToMove = !result.m_sideToMove;
@@ -284,7 +279,7 @@ std::pair<GameState, bool> GameState::performMove(Move move) const
 	if(movingColor == BLACK) result.m_fullMoveCount++;
 	result.m_halfMoveClock++;
 
-	return std::make_pair(result, isLegal);
+	return result;
 }
 
 GameState GameState::performNullMove() const
@@ -294,4 +289,12 @@ GameState GameState::performNullMove() const
 	result.m_sideToMove = !result.m_sideToMove;
 
 	return result;
+}
+
+bool GameState::isLegal() const
+{
+	if(m_sideToMove == WHITE)
+		return !isAttacked<WHITE>(firstSquare(getPieces<BLACK, KING>()));
+	else
+		return !isAttacked<BLACK>(firstSquare(getPieces<WHITE, KING>()));
 }

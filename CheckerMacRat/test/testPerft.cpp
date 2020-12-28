@@ -6,14 +6,11 @@ int perft(const GameState& from, int d)
 		return 1;
 
 	int result = 0;
-
-	for(Move m : MoveGenerator::getPseudoLegalMoves(from))
+	for(Move move : MoveGenerator::getPseudoLegalMoves(from))
 	{
-		std::pair<GameState, bool> next = from.performMove(m);
-		if(next.second)
-			result += perft(next.first, d-1);
+		GameState next = from.performMove(move);
+		if(next.isLegal()) result += perft(next, d-1);
 	}
-
 	return result;
 }
 
@@ -28,9 +25,13 @@ bool testPerft()
 
 	std::string line;
 	int i = 1;
+	auto t0 = std::chrono::high_resolution_clock::now();
 
 	while(std::getline(file, line))
 	{
+		if(line.empty() || line.front() == '#')
+			continue;
+
 		//Parse la ligne du fichier
 		size_t split = line.find(';');
 		std::string fen = line.substr(0, split);
@@ -55,21 +56,20 @@ bool testPerft()
 		{
 			int depth = p.first;
 			int expected = p.second;
-			std::cout << "Calculating perft(" << depth << ")... ";
+			std::cout << "Calculating perft(" << depth << "), expecting " << p.second << ", ";
 			int result = perft(game, depth);
-			std::cout << "Found " << result;
-			if(result == expected)
+			std::cout << "found " << result << std::endl;
+			if(result != expected)
 			{
-				std::cout << ", as expected." << std::endl;
-			}
-			else
-			{
-				std::cout << ", expected " << expected << ", TEST FAILED" << std::endl;
+				std::cout << "TEST FAILED" << std::endl;
 				return false;
 			}
 		}
 	}
 
+	auto t1 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = t1 - t0;
 	std::cout << "All perft tests passed." << std::endl;
+	std::cout << "Time taken: " << elapsed.count() << " seconds" << std::endl;
 	return true;
 }

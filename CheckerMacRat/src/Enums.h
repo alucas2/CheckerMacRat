@@ -3,14 +3,14 @@
 #include <stdint.h>
 #include <type_traits>
 
-enum Col
+enum File
 {
-	COL_A, COL_B, COL_C, COL_D, COL_E, COL_F, COL_G, COL_H
+	FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H
 };
 
-enum Row
+enum Rank
 {
-	ROW_1, ROW_2, ROW_3, ROW_4, ROW_5, ROW_6, ROW_7, ROW_8
+	RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8
 };
 
 enum Square
@@ -26,10 +26,10 @@ enum Square
 	NUM_SQUARE, NULL_SQUARE
 };
 
-inline Row rowOf(Square square) { return static_cast<Row>(square / 8); }
-inline Col colOf(Square square) { return static_cast<Col>(square % 8); }
-inline char label(Row row) { return '1' + row; }
-inline char label(Col col) { return 'a' + col; }
+inline Rank rankOf(Square square) { return static_cast<Rank>(square / 8); }
+inline File fileOf(Square square) { return static_cast<File>(square % 8); }
+inline char label(Rank row) { return '1' + row; }
+inline char label(File col) { return 'a' + col; }
 
 enum Direction
 {

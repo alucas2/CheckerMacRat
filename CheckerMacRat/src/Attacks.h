@@ -126,9 +126,9 @@ template<Color color>
 Bitboard pawnPushes(Square from, Bitboard obstacles)
 {
 	constexpr Direction forward = color == WHITE ? NORTH : SOUTH;
-	constexpr Row startRow = color == WHITE ? ROW_2 : ROW_7;
+	constexpr Rank startRow = color == WHITE ? RANK_2 : RANK_7;
 
-	Row fromRow = rowOf(from);
+	Rank fromRow = rankOf(from);
 
 	Bitboard result = shift<forward>(squareMask(from)) & ~obstacles;
 	if(fromRow == startRow && result)

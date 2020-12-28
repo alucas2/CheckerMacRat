@@ -67,12 +67,14 @@ public:
 		return m_castleRights[color];
 	}
 
-	//Renvoie l'état du jeu après avoir effectué un mouvement ainsi qu'un booléen valant true
-	//ssi le roi du camp ayant joué n'est pas en échec à la fin du tour
-	std::pair<GameState, bool> performMove(Move move) const;
+	//Renvoie l'état du jeu après avoir effectué un mouvement
+	GameState performMove(Move move) const;
 
 	//Renvoie l'état du jeu après avoir passé un tour
 	GameState performNullMove() const;
+
+	//Renvoie true ssi cette position est légale
+	bool isLegal() const;
 
 	//Renvoie true ssi cette case est attaquée par une pièce de la couleur indiquée
 	template<Color color>

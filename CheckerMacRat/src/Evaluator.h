@@ -5,19 +5,22 @@
 
 class Evaluator
 {
-public:
-	//Fonction d'évaluation de la position.
-	//Positif -> en faveur des blancs, Négatif -> en faveur des noirs
-	static int evaluate(const GameState& state)
-	{
-		int score = 0;
-		score += (countSquares(state.getPieces<WHITE, KING>()) - countSquares(state.getPieces<BLACK, KING>())) * 20000;
-		score += (countSquares(state.getPieces<WHITE, QUEEN>()) - countSquares(state.getPieces<BLACK, QUEEN>())) * 900;
-		score += (countSquares(state.getPieces<WHITE, ROOK>()) - countSquares(state.getPieces<BLACK, ROOK>())) * 500;
-		score += (countSquares(state.getPieces<WHITE, BISHOP>()) - countSquares(state.getPieces<BLACK, BISHOP>())) * 330;
-		score += (countSquares(state.getPieces<WHITE, KNIGHT>()) - countSquares(state.getPieces<BLACK, KNIGHT>())) * 320;
-		score += (countSquares(state.getPieces<WHITE, PAWN>()) - countSquares(state.getPieces<BLACK, PAWN>())) * 100;
+private:
+	static int s_numEvaluations;
 
-		return score;
-	}
+public:
+	static const int s_pieceValues[NUM_PIECE];
+
+	//Evaluates a positions with an heuristic.
+	//Positive -> in favor of the white
+	//Negative -> in favor of the black
+	static int evaluateState(const GameState& state);
+
+	//Evaluates a move with an heuristic
+	//Positive -> good move
+	//Negative -> bad move
+	static int evaluateMove(const GameState& state, Move m);
+
+	//Get the number of evaluations and resets the counter
+	static int resetNumEvaluations();
 };
